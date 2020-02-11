@@ -1,5 +1,5 @@
 <?php
-	
+
 	const OWNERNONE = 0xff;
 	const OWNNOONE = 0xff;
 	const OBJECT_INVALID = -1; //invalid object id
@@ -16,22 +16,22 @@
 	const LENGTHDESCRIPTION = 200; //143
 	const MP2OFFSETDATA = 428;
 	const SIZEOFMP2TILE = 20;
-  const SIZEOFMP2ADDON = 15;
+	const SIZEOFMP2ADDON = 15;
 	const CASTLEBLOCK = 72;
-  const MINEBLOCK = 144;
+	const MINEBLOCK = 144;
 
 	const SIZEOFMP2CASTLE= 0x46;
-  const SIZEOFMP2HEROES = 0x4c;
-  const SIZEOFMP2SIGN = 0x0a;
+	const SIZEOFMP2HEROES = 0x4c;
+	const SIZEOFMP2SIGN = 0x0a;
 	const SIZEOFMP2RUMOR = 0x09;
 	const SIZEOFMP2EVENT = 0x32;
 	const SIZEOFMP2RIDDLE = 0x8a;
-	
+
 	const MAXARTIFACTID = 103;
 	const MAXSKILLID = 15;
 
 	const HNONE = 0xff;
-	
+
 
 	class MAPOBJECTS {
 		const NONE = 0;
@@ -39,16 +39,16 @@
 		const TOWN = 2;
 		const MONSTER = 3;
 	}
-	
+
 	class VICTORY {
 		const NONE = 0;
-    const CAPTURETOWN = 1;
-    const DEFEATHERO = 2;
+		const CAPTURETOWN = 1;
+		const DEFEATHERO = 2;
 		const ARTIFACT = 3;
-    const ALLIED = 4;
+		const ALLIED = 4;
 		const GOLD = 5;
 	}
-	
+
 	class LOSS {
 		const NONE = 0;
 		const TOWN = 1;
@@ -327,7 +327,7 @@
 		const OBJ_EARTHALTAR = 254;	// 0xFE
 		const OBJ_WATERALTAR = 255;	// 0xFF
 	}
-	
+
 	class COLORS {
 		const NONE	  = 0;
 		const BLUE    = 1;
@@ -343,9 +343,9 @@
 		const NONE	   = 0;
 		const MINE     = 1;
 		const ARTIFACT = 2;
-    const MONSTER  = 3;
+		const MONSTER  = 3;
 	}
-	
+
 	class HeroesConstants {
 
 		public $PlayersColours = [
@@ -369,13 +369,13 @@
 
 		public $SecondarySkill = [
 			0 => 'Unknown',
-   		1 => 'Pathfinding',
+			1 => 'Pathfinding',
 			2 => 'Archery',
 			3 => 'Logistics',
 			4 => 'Scouting',
 			5 => 'Diplomacy',
 			6 => 'Navigation',
-	 		7 => 'Leadership',
+			7 => 'Leadership',
 			8 => 'Wisdom' ,
 			9 => 'Mysticism' ,
 			10 => 'Luck' ,
@@ -397,7 +397,7 @@
 			7 => 'Random',
 			255 => 'Random'
 		];
-		
+
 		public $SecSkillLevel = [
 			0 => 'None',
 			1 => 'Basic',
@@ -418,7 +418,7 @@
 			7 => 'WASTELAND',
 			8 => 'BEACH',
 		];
-		
+
 		//full defines of obj, monsters, heroes
 		public $Monster = [
 			0 => 'Unknown Monster',
@@ -881,6 +881,75 @@
 			103 => 'Unknown',
 		];
 
+		public $Spells = [
+			0 => 'Unknown',
+			1 => 'Fireball',
+			2 => 'Fireblast',
+			3 => 'Lightning Bolt',
+			4 => 'Chain Lightning',
+			5 => 'Teleport',
+			6 => 'Cure',
+			7 => 'Mass Cure',
+			8 => 'Resurrect',
+			9 => 'Resurrect True',
+			10 => 'Haste',
+			11 => 'Mass Haste',
+			12 => 'Slow',
+			13 => 'Mass Slow',
+			14 => 'Blind',
+			15 => 'Bless',
+			16 => 'Mass Bless',
+			17 => 'Stoneskin',
+			18 => 'Steelskin',
+			19 => 'Curse',
+			20 => 'Mass Curse',
+			21 => 'Holy Word',
+			22 => 'Holy Shout',
+			23 => 'Anti-Magic',
+			24 => 'Dispel Magic',
+			25 => 'Mass Dispel',
+			26 => 'Magic Arrow',
+			27 => 'Berserker',
+			28 => 'Armageddon',
+			29 => 'Elemental Storm',
+			30 => 'Meteor Shower',
+			31 => 'Paralyze',
+			32 => 'Hypnotize',
+			33 => 'Cold Ray',
+			34 => 'Cold Ring',
+			35 => 'Disrupting Ray',
+			36 => 'Death Ripple',
+			37 => 'Death Wave',
+			38 => 'Dragon Slayer',
+			39 => 'Blood Lust',
+			40 => 'Animate Dead',
+			41 => 'Mirror Image',
+			42 => 'Shield',
+			43 => 'Mass Shield',
+			44 => 'Summon Earth Elemental',
+			45 => 'Summon Air Elemental',
+			46 => 'Summon Fire Elemental',
+			47 => 'Summon Water Elemental',
+			48 => 'Earthquake',
+			49 => 'View Mines',
+			50 => 'View Resources',
+			51 => 'View Artifacts',
+			52 => 'View Towns',
+			53 => 'View Heroes',
+			54 => 'View All',
+			55 => 'Identify Hero',
+			56 => 'Summon Boat',
+			57 => 'Dimension Door',
+			58 => 'Town Gate',
+			59 => 'Town Portal',
+			60 => 'Visions',
+			61 => 'Haunt',
+			62 => 'Set Earth Guardian',
+			63 => 'Set Air Guardian',
+			64 => 'Set Fire Guardian',
+			65 => 'Set Water Guardian',
+		];
+
 
 		public $Heroes = [
 			// knight
@@ -966,7 +1035,7 @@
 			71 => 'SandySandy',
 			72 => 'Unknown',
 		];
-		
+
 		public $ObjectsNonPassable = [
 			OBJECTS::OBJN_ABANDONEDMINE,
 			OBJECTS::OBJN_AIRALTAR,
@@ -1035,7 +1104,7 @@
 			OBJECTS::OBJN_WINDMILL,
 			OBJECTS::OBJN_WITCHSHUT,
 			OBJECTS::OBJN_XANADU,
-			
+
 			OBJECTS::OBJ_CACTUS,
 			OBJECTS::OBJ_CRATER,
 			OBJECTS::OBJ_DEADTREE,
@@ -1057,13 +1126,13 @@
 
 		public $Victory = [
 			VICTORY::NONE => 'Standard',
-      VICTORY::CAPTURETOWN => 'Capture a specific town',
-      VICTORY::DEFEATHERO => 'Defeat a specific Hero',
+			VICTORY::CAPTURETOWN => 'Capture a specific town',
+			VICTORY::DEFEATHERO => 'Defeat a specific Hero',
 			VICTORY::ARTIFACT => 'Acquire a specific artifact',
 			VICTORY::ALLIED => 'Your side defeats the opposing side',
 			VICTORY::GOLD => 'Accumulate gold',
 		];
-	
+
 		public $Loss = [
 			LOSS::NONE => 'None',
 			LOSS::TOWN => 'Lose a specific town',
@@ -1077,5 +1146,5 @@
 
 
 
-	
+
 ?>

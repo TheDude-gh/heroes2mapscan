@@ -11,7 +11,7 @@
 
 	echo $mapname;
 
-  $mapfile = MAPDIR.$mapname;
+	$mapfile = MAPDIR.$mapname;
 	if(!file_exists($mapfile)) {
 		exit;
 	}

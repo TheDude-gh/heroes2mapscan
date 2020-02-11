@@ -1,10 +1,10 @@
 <?php
 class VICTORY {
 		const NONE = 0;
-    const CAPTURETOWN = 1;
-    const DEFEATHERO = 2;
+		const CAPTURETOWN = 1;
+		const DEFEATHERO = 2;
 		const ARTIFACT = 3;
-    const ALLIED = 4;
+		const ALLIED = 4;
 		const GOLD = 5;
 	}
 
@@ -17,8 +17,8 @@ class VICTORY {
 
 	$VICTORY = [
 		VICTORY::NONE => 'Standard',
-    VICTORY::CAPTURETOWN => 'Capture a specific town',
-    VICTORY::DEFEATHERO => 'Defeat a specific Hero',
+		VICTORY::CAPTURETOWN => 'Capture a specific town',
+		VICTORY::DEFEATHERO => 'Defeat a specific Hero',
 		VICTORY::ARTIFACT => 'Acquire a specific artifact',
 		VICTORY::ALLIED => 'Your side defeats the opposing side',
 		VICTORY::GOLD => 'Accumulate gold',
@@ -31,5 +31,5 @@ class VICTORY {
 		LOSS::TIME => 'Time expire',
 	];
 
-	
+
 ?>

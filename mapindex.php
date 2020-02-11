@@ -18,8 +18,8 @@ require_once 'fun/mapindexconst.php';
 	.ar { text-align:right; }
 	.ac { text-align:center; }
 	.al { text-align:left; }
-  .mc { margin: 0px auto; }
-	
+	.mc { margin: 0px auto; }
+
 	a, a:visited { color: #00f; text-decoration: none; }
 	a:hover { text-decoration: underline; }
 
@@ -36,7 +36,7 @@ require_once 'fun/mapindexconst.php';
 
 <form method="post" action="mapindex.php">
 	<input type="text" name="map" />
-  <input type="submit" name="ok" value="Search" />
+	<input type="submit" name="ok" value="Search" />
 </form>
 <?php
 
@@ -51,18 +51,18 @@ if($cmd == 'stat') {
 }
 else {
 	$where = '';
-  $llink = '';
-	
+	$llink = '';
+
 	if($qcol != '' && $qval != ''){
-  	$qcol = mes($qcol);
-    $qval = mes($qval);
+		$qcol = mes($qcol);
+		$qval = mes($qval);
 		$where = "WHERE $qcol='$qval'";
-    $llink = 'q='.$qcol.'&amp;v='.$qval;
+		$llink = 'q='.$qcol.'&amp;v='.$qval;
 	}
 	elseif($mapsearch) {
-    $mapsearch = mes($mapsearch);
-  	$where = "WHERE m.mapname LIKE '%$mapsearch%'";
-    $llink = 'map='.$mapsearch;
+		$mapsearch = mes($mapsearch);
+		$where = "WHERE m.mapname LIKE '%$mapsearch%'";
+		$llink = 'map='.$mapsearch;
 	}
 
 	global $VICTORY;
@@ -71,7 +71,7 @@ else {
 
 	$limit = 20; //maps per page
 	$start = intval(exget('start', 0));
-  $offset = $start * $limit;
+	$offset = $start * $limit;
 
 	$sqlt = "SELECT COUNT(m.idm) AS mc
 		FROM heroes2_maps AS m
@@ -107,7 +107,7 @@ else {
 		LIMIT $offset, $limit";
 	$query = mq($sql);
 	while($res = mfa($query)) {
-  	$mapresult[] = $res;
+		$mapresult[] = $res;
 	}
 
 	usort($mapresult, 'mapsort');
@@ -118,7 +118,7 @@ else {
 		$name = $res['mapname'] != '' ? $res['mapname'] : $res['mapfile'];
 
 		$victory = array_key_exists($res['victory'], $VICTORY) ? $VICTORY[$res['victory']] : '?';
-    $loss = array_key_exists($res['loss'], $LOSS) ? $LOSS[$res['loss']] : '?';
+		$loss = array_key_exists($res['loss'], $LOSS) ? $LOSS[$res['loss']] : '?';
 
 		echo $maphead.'<tr>
 			<td><a href="mapscan.php?mapid='.$res['idm'].'">'.$name.'</a></td>
@@ -131,13 +131,13 @@ else {
 			<td>'.$loss.'</td>
 		</tr>
 		<tr>
-		  <td></td>
-		  <td colspan="8">'.nl2br($res['mapdesc']).'</td>
+			<td></td>
+			<td colspan="8">'.nl2br($res['mapdesc']).'</td>
 		</tr>
 		<tr>
-		  <td></td>
-		  <td colspan="4" class="ac">'.$imgg.'</td>
-		  <td colspan="4" class="ac"></td>
+			<td></td>
+			<td colspan="4" class="ac">'.$imgg.'</td>
+			<td colspan="4" class="ac"></td>
 		</tr>';
 	}
 
@@ -156,12 +156,12 @@ function MapStats() {
 		WHEN 'SoD' THEN  2
 		WHEN 'WOG' THEN  3
 		END";
-		
+
 	$sqls[] = "SELECT m.size, m.sizename, COUNT(m.idm) AS count
 		FROM heroes2_maps AS m
 		GROUP BY m.size
 		ORDER BY m.size";
-		
+
 	$sqls[] = "SELECT m.diff, COUNT(m.idm) AS count
 		FROM heroes2_maps AS m
 		GROUP BY m.diff
@@ -182,12 +182,12 @@ function MapStats() {
 		FROM heroes2_maps AS m
 		GROUP BY m.victory
 		ORDER BY m.victory";
-		
+
 	$sqls[] = "SELECT m.loss, COUNT(m.idm) AS count
 		FROM heroes2_maps AS m
 		GROUP BY m.loss
 		ORDER BY m.loss";
-		
+
 	$sqls[] = "SELECT m.victory, m.loss, COUNT(m.idm) AS count
 		FROM heroes2_maps AS m
 		GROUP BY m.victory, m.loss
@@ -205,8 +205,8 @@ function MakeTableFromSQL($sql) {
 	$namecol = array();
 	$query = mq($sql);
 	while($res = mfa($query)) {
-	  if($n == 0) {
-	    echo '<tr>';
+		if($n == 0) {
+			echo '<tr>';
 			foreach($res as $key => $field) {
 				if(is_int($key)) continue;
 				$namecol[] = $key;
@@ -216,10 +216,10 @@ function MakeTableFromSQL($sql) {
 			echo '</tr>';
 		}
 		$n++;
-		
+
 		echo '<tr>';
 		for($i = 0; $i < $ncol; $i++) {
-		  if($namecol[$i] == 'victory') {
+			if($namecol[$i] == 'victory') {
 				global $VICTORY;
 				$value = $VICTORY[$res[$i]];
 			}
@@ -230,12 +230,12 @@ function MakeTableFromSQL($sql) {
 			else {
 				$value = $res[$i];
 			}
-			
+
 			if($namecol[$i] != 'count') {
-			  $value = '<a href="?q='.$namecol[$i].'&amp;v='.$res[$i].'">'.$value.'</a>';
+				$value = '<a href="?q='.$namecol[$i].'&amp;v='.$res[$i].'">'.$value.'</a>';
 			}
-			
-		  $cl = $namecol[$i] == 'count' ? ' class="ar"' : '';
+
+			$cl = $namecol[$i] == 'count' ? ' class="ar"' : '';
 			echo '<td'.$cl.'>'.$value.'</td>';
 		}
 		echo '</tr>';
@@ -245,7 +245,7 @@ function MakeTableFromSQL($sql) {
 
 function more_links($div, $start, $total, $llink) {
 	$out = '<p class="mc ac">';
-  $posts = ceil($total / $div);
+	$posts = ceil($total / $div);
 	for($i = $posts; $i > 0; $i--){
 		$link = $posts - $i + 1;
 		if($start == $link - 1) {

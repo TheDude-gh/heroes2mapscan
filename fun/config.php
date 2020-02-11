@@ -11,5 +11,5 @@
 	DEFINE('MAPDIRIMG', './mapsimg/');
 
 	require_once './fun/access.php';
-	
+
 ?>

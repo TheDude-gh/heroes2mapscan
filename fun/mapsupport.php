@@ -65,7 +65,7 @@ class StringConvert {
 			chr(0x99) => '&trade;',
 			chr(0x9B) => '&rsquo;',
 			chr(0xA6) => '&brvbar;',
-      chr(0xA8) => 'Ë',
+			chr(0xA8) => 'Ë',
 			chr(0xA9) => '&copy;',
 			chr(0xAB) => '&laquo;',
 			chr(0xAE) => '&reg;',
@@ -73,7 +73,7 @@ class StringConvert {
 			chr(0xB5) => '&micro;',
 			chr(0xB6) => '&para;',
 			chr(0xB7) => '&middot;',
-      chr(0xB8) => 'ë',
+			chr(0xB8) => 'ë',
 			chr(0xBB) => '&raquo;',
 			chr(0xc0) => 'А',
 			chr(0xc1) => 'Б',
@@ -209,18 +209,18 @@ class TimeMeasure {
 	private $prev = 0;
 	private $now;
 	private $times = array();
-	
+
 	public function __construct () {
 		$this->start = tmc();
 		$this->times[] = array('start', $this->start);
 	}
-	
+
 	public function Measure($desc = ''){
 		$this->prev = $this->prev == 0 ? $this->start : $this->now;
 		$this->now = tmc();
 		$this->times[] = array($desc, $this->now);
 	}
-	
+
 	public function ShowTime($print = 1, $pos = -1, $text = '') {
 		if($pos == -1) {
 			$echo = sprintf('%3.3f', ($this->now - $this->start)).' s'.ENVE;
@@ -246,7 +246,7 @@ class TimeMeasure {
 		}
 		echo '</table>';
 	}
-	
+
 }
 
 function sanity_string($string) {

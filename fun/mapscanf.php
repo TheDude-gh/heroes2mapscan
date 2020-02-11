@@ -18,7 +18,7 @@ class H2MAPSCAN {
 	private $lossCond = array();
 	private $victoryInfo = '';
 	private $lossInfo = '';
-	
+
 	private $rumors = array();
 	private $events = array();
 
@@ -32,17 +32,17 @@ class H2MAPSCAN {
 	private $towns_list = array();
 	private $mines_list = array();
 	private $monsters_list = array();
-  private $signs_list = array();
-  private $events_list = array();
-  private $sphinxs_list = array();
-	
+	private $signs_list = array();
+	private $events_list = array();
+	private $sphinxs_list = array();
+
 	//curent object being read and its coords
 	private $curobj;
 	private $curcoor;
 	private $curowner;
 
 	private $mapobjects = array(); //heroes, towns and monsters
-	
+
 	private $map_size = 0;
 	private $map_sizename = '';
 	private $terrain = array();
@@ -50,40 +50,40 @@ class H2MAPSCAN {
 
 	private $img;
 	private $imgcolors = array();
-	
+
 	private $name = '';
-	
+
 	private $mapdata = '';
 	private $mapfile = '';
 	private $mapfilename = '';
 	private $mapfileout = '';
 	private $mapimage; //mapfile name for DB
-	
+
 	private $players = array();
 	private $mapplayersnum = 0;
 	private $mapplayershuman = 0;
 	private $mapplayersai = 0;
-  private $obeliskNum = 0;
-	
+	private $obeliskNum = 0;
+
 	private $CS; //heroes constants class
-  private $SC; //String Convert
-	
+	private $SC; //String Convert
+
 	private $printoutput = false;
 	private $webmode = true;
 	private $buildMapImage = true;
 
 	private $debug;
-	
+
 	private $pos = 0;
 	private $length = 0;
-	
+
 	private $filemtime = '';
 	private $filectime = '';
 	private $filesize = 0;
 	private $filebad = false;
-	
+
 	private $save = false; //save maps to db
-	
+
 
 	public function __construct($mapfile, $webmode) {
 		$this->webmode = $webmode;
@@ -97,22 +97,22 @@ class H2MAPSCAN {
 			$this->filebad = true;
 			return false;
 		}
-		
+
 		$this->mapfilename = $path['filename'];
 		$this->version = (strcasecmp($path['extension'], 'MP2') == 0) ? $this::H2O : $this::POL;
 
 		$this->filesize  = filesize($this->mapfile);
 		$this->filemtime = filemtime($this->mapfile);
 		$this->filectime = filectime($this->mapfile);
-		
+
 		$this->mapdata = file_get_contents($this->mapfile);
 		$this->length = strlen($this->mapdata);
 	}
-	
+
 	public function SetSaveMap($value) {
 		$this->save = $value;
 	}
-	
+
 	public function SaveMap() {
 		$mappi = pathinfo($this->mapfile);
 		$mapfile = mes($mappi['basename']);
@@ -127,24 +127,24 @@ class H2MAPSCAN {
 		$mapdir = mes($mappi['dirname']);
 		$mapname = mes($this->map_name);
 		$mapdesc = mes($this->description);
-    $mapimage = mes($this->mapimage);
+		$mapimage = mes($this->mapimage);
 
 		$sql = "INSERT INTO heroes2_maps (`mapfile`, `mapdir`, `mapname`, `mapdesc`, `version`, `size`, `sizename`, `diff`,
 			`playersnum`, `playhuman`, `playai`, `teamnum`, `victory`, `loss`, `filecreate`, `filechanged`, `filesize`,
 			`mapimage`) VALUES
 			('$mapfile', '$mapdir/', '$mapname', '$mapdesc', '".$this->versionname."', ".$this->map_size.", '".$this->map_sizename."',
 				'".$this->map_diffname."', ".$this->mapplayersnum.", ".$this->mapplayershuman.", ".$this->mapplayersai.",
-				 ".$this->teamscount.", ".$this->victoryCond['type'].", ".$this->lossCond['type'].",
+				".$this->teamscount.", ".$this->victoryCond['type'].", ".$this->lossCond['type'].",
 			FROM_UNIXTIME(".$this->filectime."), FROM_UNIXTIME(".$this->filemtime."), ".$this->filesize.", '".$mapimage."')";
 		mq($sql);
 	}
-	
+
 	public function PrintStateSet($enable, $mapbuild = true, $special = false) {
 		$this->printoutput = $enable ? true : false;
 		$this->buildMapImage = $mapbuild ? true : false;
-    $this->special = $special ? true : false;
+		$this->special = $special ? true : false;
 	}
-	
+
 	public function PrintMapInfo() {
 		$this->ParseFinish();
 
@@ -162,7 +162,7 @@ class H2MAPSCAN {
 			</table>';
 
 			$this->DisplayMap();
-			
+
 			echo '<table class="smalltable">
 				<tr>
 					<th>Players</th>
@@ -177,14 +177,14 @@ class H2MAPSCAN {
 					<th>Heroes count</th>
 					<th>Heroes names</th>
 				</tr>';
-				
-				
+
+
 			foreach($this->players as $k => $player) {
 				if(!$player['human'] && !$player['ai']) continue;
-				
+
 				$team = '';
 				if($this->teamscount > 1) {
-				  $team = in_array($k, $this->teams[0]) ? 1 : 2;
+					$team = in_array($k, $this->teams[0]) ? 1 : 2;
 				}
 
 				echo '<tr>
@@ -216,10 +216,10 @@ class H2MAPSCAN {
 					<td>'.$town->mapcoor->GetCoords().'</td>
 					<td>'.$town->owner.'</td>
 					<td>'.$town->info.'</td>
-          <td>'.$this->PrintTroops($town->count).'</td>
+					<td>'.$this->PrintTroops($town->count).'</td>
 				</tr>';
 			}
-      echo '</table>';
+			echo '</table>';
 
 			$n = 0;
 			echo '
@@ -228,21 +228,21 @@ class H2MAPSCAN {
 					<th>Patrol</th><th>Artifacts</th><th>Troops</th></tr>';
 			foreach($this->heroes_list as $hero) {
 				$artifacts = array_key_exists('Artifacts', $hero['data']) ? implode($hero['data']['Artifacts'], ', ') : '';
-        $troops = array_key_exists('troops', $hero['data']) ? $this->PrintTroops($hero['data']['troops']) : '';
+				$troops = array_key_exists('troops', $hero['data']) ? $this->PrintTroops($hero['data']['troops']) : '';
 				echo '<tr>
 					<td>'.(++$n).'</td>
 					<td>'.$hero['data']['name'].'</td>
 					<td>'.$hero['coor']->GetCoords().'</td>
-          <td>'.$hero['data']['race'].'</td>
+					<td>'.$hero['data']['race'].'</td>
 					<td>'.$hero['data']['color'].'</td>
-          <td>'.$hero['data']['exp'].'</td>
-          <td>'.$hero['data']['patrol'].' : '.$hero['data']['radius'].'</td>
+					<td>'.$hero['data']['exp'].'</td>
+					<td>'.$hero['data']['patrol'].' : '.$hero['data']['radius'].'</td>
 					<td>'.$artifacts.'</td>
-          <td>'.$troops.'</td>
+					<td>'.$troops.'</td>
 				</tr>';
 			}
-      echo '</table>';
-			
+			echo '</table>';
+
 			//mines list
 			usort($this->mines_list, 'ListSortByName');
 			$n = 0;
@@ -250,7 +250,7 @@ class H2MAPSCAN {
 				<table class="smalltable">
 					<tr><th>Mines</th><th>Name</th><th>Position</th><th>Owner</th></tr>';
 			foreach($this->mines_list as $mine) {
-			  $owner = $mine->owner;
+				$owner = $mine->owner;
 				echo '<tr>
 					<td>'.(++$n).'</td>
 					<td>'.$mine->name.'</td>
@@ -258,9 +258,9 @@ class H2MAPSCAN {
 					<td>'.$owner.'</td>
 				</tr>';
 			}
-      echo '</table>';
+			echo '</table>';
 
-      //artifact list
+			//artifact list
 			usort($this->artifacts_list, 'ListSortByName');
 			$n = 0;
 			echo '
@@ -274,7 +274,7 @@ class H2MAPSCAN {
 					<td>'.$art->parent.'</td>
 				</tr>';
 			}
-      echo '</table>';
+			echo '</table>';
 
 
 			//monster list
@@ -292,7 +292,7 @@ class H2MAPSCAN {
 					<td>'.$mon->parent.'</td>
 				</tr>';
 			}
-      echo '</table>';
+			echo '</table>';
 
 
 			//sphinx list
@@ -307,11 +307,11 @@ class H2MAPSCAN {
 					<td>'.$sph->owner.'</td>
 					<td>'.$sph->mapcoor->GetCoords().'</td>
 					<td>'.$sph->count.'</td>
-          <td>'.$sph->info.'</td>
+					<td>'.$sph->info.'</td>
 				</tr>';
 			}
-      echo '</table>';
-      
+			echo '</table>';
+
 
 			//signs, bottles
 			$n = 0;
@@ -321,8 +321,8 @@ class H2MAPSCAN {
 				echo '<tr>
 					<td>'.(++$n).'</td>
 					<td>'.$sign->name.'</td>
-          <td>'.$sign->parent.'</td>
-          <td>'.$sign->mapcoor->GetCoords().'</td>
+					<td>'.$sign->parent.'</td>
+					<td>'.$sign->mapcoor->GetCoords().'</td>
 				</tr>';
 			}
 			echo '</table>';
@@ -378,15 +378,15 @@ class H2MAPSCAN {
 			}
 			echo '</table>';
 	}
-	
+
 	public function ReadMap() {
 		if($this->filebad) {
 			return;
 		}
-		
+
 		$this->SetPos(0);
 		$this->CS = new HeroesConstants();
-    $this->SC = new StringConvert();
+		$this->SC = new StringConvert();
 
 		$version = $this->ReadUint32(); //all the same
 
@@ -409,7 +409,7 @@ class H2MAPSCAN {
 
 		// kingdom color - blue, green, red, yellow, orange, purple
 		for($i = 0; $i < PLAYERSNUM; $i++) {
-		  if($this->ReadUint8()) {
+			if($this->ReadUint8()) {
 				$this->mapplayersnum++;
 				$this->players[$i] = array();
 			}
@@ -440,36 +440,36 @@ class H2MAPSCAN {
 				$this->players[$i]['ai'] = 1;
 			}
 		}
-		
-    // Special Victory Condition
+
+		// Special Victory Condition
 		$this->VictoryCondition();
 		// Special loss condition
 		$this->LossCondition();
 
-    // start with hero
-    $this->SetPos(0x25);
-    $with_heroes = ($this->ReadUint8() == 0);
+		// start with hero
+		$this->SetPos(0x25);
+		$with_heroes = ($this->ReadUint8() == 0);
 
 		for($i = 0; $i < PLAYERSNUM; $i++) {
-		  $race = $this->ReadUint8();
-		  if(array_key_exists($i, $this->players)) {
+			$race = $this->ReadUint8();
+			if(array_key_exists($i, $this->players)) {
 				$this->players[$i]['towns_allowed'] = $this->CS->TownType[$race];
 			}
 		}
 
-    // name
-    $this->SetPos(0x3a);
-    $this->map_name = $this->ReadString(LENGTHNAME);
+		// name
+		$this->SetPos(0x3a);
+		$this->map_name = $this->ReadString(LENGTHNAME);
 
-    // description
-    $this->SetPos(0x76);
-    $this->description = $this->ReadString(LENGTHDESCRIPTION);
-		
+		// description
+		$this->SetPos(0x76);
+		$this->description = $this->ReadString(LENGTHDESCRIPTION);
+
 		$this->ReadTerrain();
-		
-    $this->ReadCastles();
+
+		$this->ReadCastles();
 		$this->Mines();
-		
+
 		$this->FinalBlocks();
 
 		if($this->buildMapImage) {
@@ -479,20 +479,20 @@ class H2MAPSCAN {
 		if($this->printoutput && $this->webmode) {
 			$this->PrintMapInfo();
 		}
-		
+
 		if($this->save == true){
-   		$this->SaveMap();
+			$this->SaveMap();
 		}
 	}
 
 	private function ReadCastles() {
-    // 72 x 3 byte (cx, cy, id)
+		// 72 x 3 byte (cx, cy, id)
 
 		//we can get castle info from FinalBlocks function, so we can just skip this
 		$this->SkipBytes(216);
 		return;
 
-    for($i = 0; $i < CASTLEBLOCK; $i++) {
+		for($i = 0; $i < CASTLEBLOCK; $i++) {
 
 			$cx = $this->ReadUint8();
 			$cy = $this->ReadUint8();
@@ -507,7 +507,7 @@ class H2MAPSCAN {
 			switch($id) {
 				case 0x00: // tower: knight
 				case 0x80: // castle: knight
-        	$town['type'] = TOWNTYPE::KNIGHT;
+					$town['type'] = TOWNTYPE::KNIGHT;
 					break;
 
 				case 0x01: // tower: barbarian
@@ -517,7 +517,7 @@ class H2MAPSCAN {
 
 				case 0x02: // tower: sorceress
 				case 0x82: // castle: sorceress
-				  $town['type'] = TOWNTYPE::SORCERESS;
+					$town['type'] = TOWNTYPE::SORCERESS;
 					break;
 
 				case 0x03: // tower: warlock
@@ -532,7 +532,7 @@ class H2MAPSCAN {
 
 				case 0x05: // tower: necromancer
 				case 0x85: // castle: necromancer
-        	$town['type'] = TOWNTYPE::NECROMANCER;
+					$town['type'] = TOWNTYPE::NECROMANCER;
 					break;
 
 				case 0x06: // tower: random
@@ -541,23 +541,23 @@ class H2MAPSCAN {
 					break;
 
 				default:
-					continue;					
+					continue;
 			}
 
-      $town['coor'] = new MapCoords($cx, $cy);
-      $town['name'] = 'Castle N';
-      $town['player'] = OWNNOONE;
-      $town['race'] = $this->CS->TownType[$town['type']];
-      $town['objid'] = OBJECTS::OBJ_CASTLE;
-			
+			$town['coor'] = new MapCoords($cx, $cy);
+			$town['name'] = 'Castle N';
+			$town['player'] = OWNNOONE;
+			$town['race'] = $this->CS->TownType[$town['type']];
+			$town['objid'] = OBJECTS::OBJ_CASTLE;
+
 			$this->objects[] = $town;
-    }
+		}
 	}
 
 	private function Mines() {
-  	// 144 x 3 byte (cx, cy, id)
+		// 144 x 3 byte (cx, cy, id)
 
-  	for($i = 0; $i < MINEBLOCK; $i++) {
+		for($i = 0; $i < MINEBLOCK; $i++) {
 			$cx = $this->ReadUint8();
 			$cy = $this->ReadUint8();
 			$id = $this->ReadUint8();
@@ -569,46 +569,46 @@ class H2MAPSCAN {
 
 			$mine = array();
 			$ismine = true;
-      switch($id) {
+			switch($id) {
 				// wood
 				case 0x00:
-     			$mine['objid'] = OBJECTS::OBJ_SAWMILL;
-          $mine['name'] = $this->CS->Mines[$id];
+					$mine['objid'] = OBJECTS::OBJ_SAWMILL;
+					$mine['name'] = $this->CS->Mines[$id];
 					break;
 				// mercury
 				case 0x01:
 					$mine['objid'] = OBJECTS::OBJ_ALCHEMYLAB;
-          $mine['name'] = $this->CS->Mines[$id];
+					$mine['name'] = $this->CS->Mines[$id];
 					break;
 				// ore
-	 			case 0x02:
-        	$mine['objid'] = OBJECTS::OBJ_MINES;
-          $mine['name'] = $this->CS->Mines[$id];
+				case 0x02:
+					$mine['objid'] = OBJECTS::OBJ_MINES;
+					$mine['name'] = $this->CS->Mines[$id];
 					break;
 				// sulfur
 				case 0x03:
-        	$mine['objid'] = OBJECTS::OBJ_MINES;
-          $mine['name'] = $this->CS->Mines[$id];
+					$mine['objid'] = OBJECTS::OBJ_MINES;
+					$mine['name'] = $this->CS->Mines[$id];
 					break;
 				// crystal
 				case 0x04:
-          $mine['objid'] = OBJECTS::OBJ_MINES;
-          $mine['name'] = $this->CS->Mines[$id];
+					$mine['objid'] = OBJECTS::OBJ_MINES;
+					$mine['name'] = $this->CS->Mines[$id];
 					break;
 				// gems
 				case 0x05:
-          $mine['objid'] = OBJECTS::OBJ_MINES;
-          $mine['name'] = $this->CS->Mines[$id];
+					$mine['objid'] = OBJECTS::OBJ_MINES;
+					$mine['name'] = $this->CS->Mines[$id];
 					break;
 				// gold
 				case 0x06:
-          $mine['objid'] = OBJECTS::OBJ_MINES;
-          $mine['name'] = $this->CS->Mines[$id];
+					$mine['objid'] = OBJECTS::OBJ_MINES;
+					$mine['name'] = $this->CS->Mines[$id];
 					break;
 
 				// lighthouse
 				case 0x64:
-          $ismine = false;
+					$ismine = false;
 					$mine['objid'] = OBJECTS::OBJ_LIGHTHOUSE;
 					break;
 				// dragon city
@@ -618,7 +618,7 @@ class H2MAPSCAN {
 					break;
 				// abandoned mines
 				case 0x67:
-				  $ismine = false;
+					$ismine = false;
 					$mine['objid'] = OBJECTS::OBJ_ABANDONEDMINE;
 					break;
 				default:
@@ -626,32 +626,32 @@ class H2MAPSCAN {
 			}
 
 			$mine['coor'] = new MapCoords($cx, $cy);
-      $mine['player'] = OWNNOONE;
+			$mine['player'] = OWNNOONE;
 			if($ismine) {
-	      /* prepare tile access for mines
+				/* prepare tile access for mines
 					xox
 				*/
 
-		  	$x0 = $cx;
-		    $y0 = $cy;
+				$x0 = $cx;
+				$y0 = $cy;
 				$xm = ($mine['objid'] == OBJECTS::OBJ_SAWMILL) ? $x0 - 2 : $x0 - 1;
 				$xx = $x0 + 1;
 				$ym = $y0;
 				for($x = $xm; $x <= $xx; $x++) {
-		    	for($y = $ym; $y <= $y0; $y++) {
+					for($y = $ym; $y <= $y0; $y++) {
 						if($x == $x0 || ($x < 0 || $y < 0 || $x > $this->map_size|| $y > $this->map_size)) {
 							continue;
 						}
-		      	$this->terrain[$y][$x]->owner = COLORS::NONE;
+						$this->terrain[$y][$x]->owner = COLORS::NONE;
 					}
 				}
 
 				$this->mines_list[] = new Listobject($mine['name'], $mine['coor'], '', OWNERNONE, 0, $id);
 				if($this->special_access) {
-        	$this->terrain[$cy][$cx]->special = MAPSPECIAL::MINE; //special color for mine access tile
+					$this->terrain[$cy][$cx]->special = MAPSPECIAL::MINE; //special color for mine access tile
 				}
 				else {
-        	$this->terrain[$cy][$cx]->owner = COLORS::NONE;
+					$this->terrain[$cy][$cx]->owner = COLORS::NONE;
 				}
 			}
 
@@ -665,9 +665,9 @@ class H2MAPSCAN {
 
 		//final blocks
 		while(true) {
-    	$l = $this->ReadUint8();
-    	$h = $this->ReadUint8();
-      if($h == 0 && $l == 0) {
+			$l = $this->ReadUint8();
+			$h = $this->ReadUint8();
+			if($h == 0 && $l == 0) {
 				break;
 			}
 			else {
@@ -676,15 +676,15 @@ class H2MAPSCAN {
 		}
 
 		// castle or heroes or (events, rumors, etc)
-    for($i = 0; $i < $countblock; $i++) {
-      $findobject = -1;
-      // read block
+		for($i = 0; $i < $countblock; $i++) {
+			$findobject = -1;
+			// read block
 			$blocksize = $this->ReadUint16();
 
 			//get object tileindex based on some magic
 			foreach($this->objectsX as $tileindex) {
 				$x = $tileindex % $this->map_size;
-        $y = ($tileindex - $x) / $this->map_size;
+				$y = ($tileindex - $x) / $this->map_size;
 				$cell = $this->terrain[$y][$x];
 
 				$orders = ($cell->quantity2 << 8) | $cell->quantity1;
@@ -692,22 +692,22 @@ class H2MAPSCAN {
 					$findobject = $tileindex;
 				}
 			}
-			
+
 			//valid tileindex
 			if($findobject >= 0) {
 				$x = $findobject % $this->map_size;
-        $y = ($findobject - $x) / $this->map_size;
+				$y = ($findobject - $x) / $this->map_size;
 				$cell = $this->terrain[$y][$x];
 
-        $obj = array();
+				$obj = array();
 				$obj['objid'] = $cell->generalObject;
 				$obj['name'] = $this->GetObjectById($obj['objid']);
-        $obj['coor'] = new MapCoords($x, $y);
-        $this->curcoor = $obj['coor'];
+				$obj['coor'] = new MapCoords($x, $y);
+				$this->curcoor = $obj['coor'];
 
 				switch($obj['objid']) {
 					case OBJECTS::OBJ_CASTLE:
-          case OBJECTS::OBJ_RNDTOWN:
+					case OBJECTS::OBJ_RNDTOWN:
 					case OBJECTS::OBJ_RNDCASTLE:
 						// add castle
 						if(SIZEOFMP2CASTLE != $blocksize) {
@@ -720,32 +720,32 @@ class H2MAPSCAN {
 						break;
 
 					case OBJECTS::OBJ_JAIL:
-          case OBJECTS::OBJ_HEROES:
-          	if(SIZEOFMP2HEROES != $blocksize) {
+					case OBJECTS::OBJ_HEROES:
+						if(SIZEOFMP2HEROES != $blocksize) {
 							echo 'Wrong hero size';
-              $this->SkipBytes($blocksize);
+							$this->SkipBytes($blocksize);
 							continue;
 						}
 						$obj['data'] = $this->ReadHero($obj['objid'], $cell->indexName1);
-            $this->terrain[$y][$x]->owner = $obj['data']['owner'];
-            $this->heroes_list[] = $obj;
+						$this->terrain[$y][$x]->owner = $obj['data']['owner'];
+						$this->heroes_list[] = $obj;
 						break;
 
-          case OBJECTS::OBJ_SIGN:
+					case OBJECTS::OBJ_SIGN:
 					case OBJECTS::OBJ_BOTTLE:
-          	$this->curobj = $obj['objid'];
-          	$obj['data'] = $this->ReadSignBottle($blocksize);
+						$this->curobj = $obj['objid'];
+						$obj['data'] = $this->ReadSignBottle($blocksize);
 						break;
 
 					case OBJECTS::OBJ_EVENT:
-          	$obj['data'] = $this->ReadEvent($blocksize);
+						$obj['data'] = $this->ReadEvent($blocksize);
 						break;
 
 					case OBJECTS::OBJ_SPHINX:
-          	$obj['data'] = $this->ReadSphinx($blocksize);
+						$obj['data'] = $this->ReadSphinx($blocksize);
 						break;
-					
-					
+
+
 				} //switch end
 
 				//not really needed to save all objects to one array, not used anywhere
@@ -761,11 +761,11 @@ class H2MAPSCAN {
 				}
 				// add rumors
 				elseif($blocksize > (SIZEOFMP2RUMOR - 1) && $rumorcheck) {
-				  $this->SkipBytes(8);
-				  $this->rumors[] = $this->ReadString($blocksize - 8);
+					$this->SkipBytes(8);
+					$this->rumors[] = $this->ReadString($blocksize - 8);
 				}
 				else {
-				  //if no valid or empty object, skip full block
+					//if no valid or empty object, skip full block
 					$this->SkipBytes($blocksize);
 				}
 			}
@@ -777,36 +777,36 @@ class H2MAPSCAN {
 		$castle = array();
 
 		$player = $this->ReadUint8(); //0-5
-    $color = $player + 1; //0 + 1-6
+		$color = $player + 1; //0 + 1-6
 		if($player > 5) {
-      $color = COLORS::NONE;
+			$color = COLORS::NONE;
 		}
 		else {
 			$this->players[$player]['townsOwned']++;
 			$this->players[$player]['townpos'] = $this->curcoor;
 		}
-    $castle['owner'] = $color;
+		$castle['owner'] = $color;
 		$castle['player'] = $this->CS->PlayersColours[$color];
 
 		/* add owner to the castle tiles and access
-				 xxx
+				xxx
 				xxoxx
 		*/
-		
-  	$x0 = $this->curcoor->x;
-    $y0 = $this->curcoor->y;
+
+		$x0 = $this->curcoor->x;
+		$y0 = $this->curcoor->y;
 		$xm = $x0 - 2;
 		$xx = $x0 + 2;
 		$ym = $y0 - 1;
 		for($x = $xm; $x <= $xx; $x++) {
-    	for($y = $ym; $y <= $y0; $y++) {
+			for($y = $ym; $y <= $y0; $y++) {
 				if($y == $ym && ($x == $xm || $x == $xx)) continue;
-      	$this->terrain[$y][$x]->owner = $color;
+				$this->terrain[$y][$x]->owner = $color;
 			}
 		}
 
 		// custom building
-    $customBuildings = $this->ReadUint8();
+		$customBuildings = $this->ReadUint8();
 		if($customBuildings) {
 			// building
 			$build = $this->ReadUint16();
@@ -815,7 +815,7 @@ class H2MAPSCAN {
 
 			//detailed building info skipped, just show bits
 			$castle['buildings'] = $this->bvar($build);
-      $castle['dwelling'] = $this->bvar($dwelling);
+			$castle['dwelling'] = $this->bvar($dwelling);
 
 			// magic tower
 			$castle['mageguild'] = $this->ReadUint8();
@@ -825,7 +825,7 @@ class H2MAPSCAN {
 		}
 
 		// custom troops
-    $castle['troops'] = array();
+		$castle['troops'] = array();
 		$custom_troops = $this->ReadUint8();
 		if($custom_troops) {
 			$castle['troops'] = $this->ReadTroops();
@@ -834,29 +834,29 @@ class H2MAPSCAN {
 			$this->SkipBytes(15);
 		}
 
-    // captain
+		// captain
 		$castle['captain'] = $this->ReadUint8();
 
-    // custom name, read always, since some default name is saved anyway
-    $this->SkipBytes(1);
+		// custom name, read always, since some default name is saved anyway
+		$this->SkipBytes(1);
 		$castle['Name'] = $this->ReadString(13);
 
-    // race
-    $towntype = $this->ReadUint8();
+		// race
+		$towntype = $this->ReadUint8();
 		if($towntype > 5) {
-    	$towntype = TOWNTYPE::RANDOM;
+			$towntype = TOWNTYPE::RANDOM;
 		}
-    $castle['type'] = $this->GetTownById($towntype);
+		$castle['type'] = $this->GetTownById($towntype);
 
 		// castle
-    $castle['Fort'] = $this->ReadUint8();
+		$castle['Fort'] = $this->ReadUint8();
 
 		// allow upgrade to castle (0 - true, 1 - false)
 		$castle['AllowUpgrade'] = ($this->ReadUint8() == 0);
-			
+
 		// unknown
-    $this->SkipBytes(29);
-	
+		$this->SkipBytes(29);
+
 		$this->towns_list[] = new Listobject($castle['Name'], $this->curcoor, '', $castle['player'], $castle['troops'], $castle['type']);
 
 		return $castle;
@@ -869,22 +869,22 @@ class H2MAPSCAN {
 		$color = COLORS::NONE;
 		if($objid != OBJECTS::OBJ_JAIL) {
 			if($affiliation < 7) {
-			  $color = COLORS::BLUE;
+				$color = COLORS::BLUE;
 			}
 			elseif($affiliation < 14) {
-			  $color = COLORS::GREEN;
+				$color = COLORS::GREEN;
 			}
 			elseif($affiliation < 21) {
-			  $color = COLORS::RED;
+				$color = COLORS::RED;
 			}
 			elseif($affiliation < 28) {
-			  $color = COLORS::YELLOW;
+				$color = COLORS::YELLOW;
 			}
 			elseif($affiliation < 35) {
-			  $color = COLORS::ORANGE;
+				$color = COLORS::ORANGE;
 			}
 			else {
-			  $color = COLORS::PURPLE;
+				$color = COLORS::PURPLE;
 			}
 			$this->players[$color - 1]['HeroCount']++;
 		}
@@ -892,104 +892,104 @@ class H2MAPSCAN {
 		$hero['color'] = $this->CS->PlayersColours[$color];
 		$hero['race'] = 0; //later
 
-    // unknown
-    $this->SkipBytes(1);
+		// unknown
+		$this->SkipBytes(1);
 
-    // custom troops
-    $hastroops = $this->ReadUint8();
-    if($hastroops) {
-      $hero['troops'] = $this->ReadTroops();
-    }
-    else {
+		// custom troops
+		$hastroops = $this->ReadUint8();
+		if($hastroops) {
+			$hero['troops'] = $this->ReadTroops();
+		}
+		else {
 			$this->SkipBytes(15);
 		}
 
-    // custom portrait
-    $hasportrait = $this->ReadUint8();
-    if($hasportrait) {
+		// custom portrait
+		$hasportrait = $this->ReadUint8();
+		if($hasportrait) {
 			$hero['portrait'] = $this->ReadUint8();
 		}
 		else {
 			$this->SkipBytes(1);
 		}
 
-    // 3 artifacts
-    for($i = 0; $i < 3; $i++) {
-    	$artid = $this->ReadUint8();
-    	if($artid < MAXARTIFACTID) {
+		// 3 artifacts
+		for($i = 0; $i < 3; $i++) {
+			$artid = $this->ReadUint8();
+			if($artid < MAXARTIFACTID) {
 				$artifact = $this->GetArtifactById($artid);
-    		$hero['Artifacts'][] = $artifact;
-        $this->artifacts_list[] = new ListObject($artifact, $this->curcoor, 'Hero: '.$hero['name']);
-    	}
-    }
+				$hero['Artifacts'][] = $artifact;
+				$this->artifacts_list[] = new ListObject($artifact, $this->curcoor, 'Hero: '.$hero['name']);
+			}
+		}
 
-    // unknown byte
-    $this->SkipBytes(1);
+		// unknown byte
+		$this->SkipBytes(1);
 
-    // experience
-    $hero['exp'] = $this->ReadUint32();
+		// experience
+		$hero['exp'] = $this->ReadUint32();
 
-    // custom skill
-    $custom_secskill = $this->ReadUint8();
-    if($custom_secskill) {
+		// custom skill
+		$custom_secskill = $this->ReadUint8();
+		if($custom_secskill) {
 			for($i = 0; $i < 8; $i++) {
 				$skill = $this->ReadUint8() + 1;
 				if($skill > MAXSKILLID) continue;
 				$hero['skills'][$i] = array($this->GetSecskillById($skill), 0);
-    	}
-    	for($i = 0; $i < 8; $i++) {
-    		$level = $this->ReadUint8();
-    		if($level == 0) continue;
-    		$hero['skills'][$i][1] = $level;
-    	}
+			}
+			for($i = 0; $i < 8; $i++) {
+				$level = $this->ReadUint8();
+				if($level == 0) continue;
+				$hero['skills'][$i][1] = $level;
+			}
 		}
 		else {
 			$this->SkipBytes(16);
 		}
 
-    // unknown
-    $this->SkipBytes(1);
+		// unknown
+		$this->SkipBytes(1);
 
-    // custom name
-    $hasName = $this->ReadUint8();
-    if($hasName) {
+		// custom name
+		$hasName = $this->ReadUint8();
+		if($hasName) {
 			$hero['name'] = $this->ReadString(13);
-    }
-    else {
+		}
+		else {
 			$this->SkipBytes(13);
 			if($hasportrait) {
-      	$hero['name'] = $this->GetHeroById($hero['portrait']);
+				$hero['name'] = $this->GetHeroById($hero['portrait']);
 			}
 		}
 
-    if($color >= 1 && $color <= 6) {
+		if($color >= 1 && $color <= 6) {
 			$this->players[$color - 1]['HeroName'][] = $hero['name'];
 		}
 
-    // patrol
-    $hero['patrol'] = $this->ReadUint8();
-    $hero['radius'] = 0;
-    // count square
-    $radius = $this->ReadUint8(); //radius for normal hero, race for imprisoned hero
+		// patrol
+		$hero['patrol'] = $this->ReadUint8();
+		$hero['radius'] = 0;
+		// count square
+		$radius = $this->ReadUint8(); //radius for normal hero, race for imprisoned hero
 
 
 		if($objid != OBJECTS::OBJ_JAIL) {
-		  $hero['radius'] = $radius;
+			$hero['radius'] = $radius;
 		}
 		else {
-		  $affiliation = $radius;
+			$affiliation = $radius;
 		}
 
 		$race = TOWNTYPE::RANDOM;
 		switch($affiliation % 7) {
-        case 0: $race = TOWNTYPE::KNIGHT; break;
-        case 1: $race = TOWNTYPE::BARBAR; break;
-        case 2: $race = TOWNTYPE::SORCERESS; break;
-        case 3: $race = TOWNTYPE::WARLOCK; break;
-        case 4: $race = TOWNTYPE::WIZARD; break;
-        case 5: $race = TOWNTYPE::NECROMANCER; break;
-        case 6: $race = TOWNTYPE::RANDOM; break;
-    }
+				case 0: $race = TOWNTYPE::KNIGHT; break;
+				case 1: $race = TOWNTYPE::BARBAR; break;
+				case 2: $race = TOWNTYPE::SORCERESS; break;
+				case 3: $race = TOWNTYPE::WARLOCK; break;
+				case 4: $race = TOWNTYPE::WIZARD; break;
+				case 5: $race = TOWNTYPE::NECROMANCER; break;
+				case 6: $race = TOWNTYPE::RANDOM; break;
+		}
 
 		$hero['color'] = $this->CS->PlayersColours[$color];
 		$hero['race'] = $this->CS->TownType[$race];
@@ -997,34 +997,34 @@ class H2MAPSCAN {
 		$this->SkipBytes(15);
 		return $hero;
 	}
-	
-  private function ReadSignBottle($blocksize) {
+
+	private function ReadSignBottle($blocksize) {
 		$sign = array();
 		$hasText = $this->ReadUint8();
-    $this->SkipBytes(SIZEOFMP2SIGN - 2); //there is 1b hastext, 8b of zero and 1b on the end of the string
+		$this->SkipBytes(SIZEOFMP2SIGN - 2); //there is 1b hastext, 8b of zero and 1b on the end of the string
 		if($hasText == 1 && $blocksize > SIZEOFMP2SIGN - 1) {
 			$sign['text'] = $this->ReadString($blocksize - SIZEOFMP2SIGN + 1);
 			$this->signs_list[] = new ListObject(($this->curobj == OBJECTS::OBJ_SIGN ? 'Sign' : 'Bottle'), $this->curcoor, $sign['text']);
 		}
 		else {
-		  $this->SkipBytes(1);
+			$this->SkipBytes(1);
 		}
 		return $sign;
 	}
 
 	private function ReadEvent($blocksize) {
-	  $event = array();
-	  
-	  $check = $this->ReadUint8();
+		$event = array();
+
+		$check = $this->ReadUint8();
 
 		if($blocksize > SIZEOFMP2EVENT - 1 && $check == 1) {
-	    $event['resources'] = $this->ReadResourses();
+			$event['resources'] = $this->ReadResourses();
 
 			$artid = $this->ReadUint16();
-      $artifact = $this->GetArtifactById($artid);
+			$artifact = $this->GetArtifactById($artid);
 			$event['artifact'] = $artifact;
 			if($artid < MAXARTIFACTID) {
-      	$this->artifacts_list[] = new ListObject($artifact, $this->curcoor, 'Event');
+				$this->artifacts_list[] = new ListObject($artifact, $this->curcoor, 'Event');
 			}
 
 			$event['aiAble'] = $this->ReadUint8();
@@ -1046,25 +1046,25 @@ class H2MAPSCAN {
 	}
 
 	private function ReadSphinx($blocksize) {
-	  $sphinx = array();
+		$sphinx = array();
 
 		$check = $this->ReadUint8();
 
 		if($blocksize > SIZEOFMP2RIDDLE - 1 && $check == 0) {
-	    $sphinx['resources'] = $this->ReadResourses();
+			$sphinx['resources'] = $this->ReadResourses();
 
 			$artid = $this->ReadUint16();
-      $artifact = $this->GetArtifactById($artid);
+			$artifact = $this->GetArtifactById($artid);
 			$sphinx['artifact'] = $artifact;
-      if($artid < MAXARTIFACTID) {
-      	$this->artifacts_list[] = new ListObject($artifact, $this->curcoor, 'Sphinx');
+			if($artid < MAXARTIFACTID) {
+				$this->artifacts_list[] = new ListObject($artifact, $this->curcoor, 'Sphinx');
 			}
 
 			$numAnswers = $this->ReadUint8();
 			$sphinx['answers'] = array();
 
 			for($i = 0; $i < 8; $i++) {
-			  if($i < $numAnswers) {
+				if($i < $numAnswers) {
 					$sphinx['answers'][] = $this->ReadString(13);
 				}
 				else {
@@ -1076,8 +1076,8 @@ class H2MAPSCAN {
 
 			$this->sphinxs_list[] = new ListObject('Sphinx', $this->curcoor, $sphinx['riddle'], implode($sphinx['answers'], '<br />'),
 				$artifact, $this->PrintResources($sphinx['resources']));
-	  }
-    else {
+		}
+		else {
 			$this->SkipBytes($blocksize - 1);
 		}
 
@@ -1085,9 +1085,9 @@ class H2MAPSCAN {
 	}
 
 	private function ReadEventDay($blocksize) {
-	  $check = $this->ReadUint8();
-    if($check == 0) {
-      $event['resources'] = $this->ReadResourses();
+		$check = $this->ReadUint8();
+		if($check == 0) {
+			$event['resources'] = $this->ReadResourses();
 
 			$this->SkipBytes(2);
 
@@ -1101,7 +1101,7 @@ class H2MAPSCAN {
 			for($i = 0; $i < PLAYERSNUM; $i++){
 				$event['players'] .= $this->ReadUint8();
 			}
-			
+
 			$event['message']= $this->ReadString();
 
 			return $event;
@@ -1112,20 +1112,20 @@ class H2MAPSCAN {
 	}
 
 	private function VictoryCondition(){
-  	$this->SetPos(0x1d);
+		$this->SetPos(0x1d);
 		$this->victoryCond['type'] = $this->ReadUint8();
-    $this->victoryCond['AI_cancomplete'] = $this->ReadUint8();
-    $this->victoryCond['Normal_end'] = $this->ReadUint8();
-    $winInfo1 = $this->ReadUint16();
-    $this->SetPos(0x2c);
-    $winInfo2 = $this->ReadUint16();
-		
+		$this->victoryCond['AI_cancomplete'] = $this->ReadUint8();
+		$this->victoryCond['Normal_end'] = $this->ReadUint8();
+		$winInfo1 = $this->ReadUint16();
+		$this->SetPos(0x2c);
+		$winInfo2 = $this->ReadUint16();
+
 		switch($this->victoryCond['type']){
-      case VICTORY::CAPTURETOWN: // 01 - Capture a specific town
+			case VICTORY::CAPTURETOWN: // 01 - Capture a specific town
 				$this->victoryCond['name'] = 'Capture a specific town';
 				$this->victoryCond['coor'] = new MapCoords($winInfo1, $winInfo2);
 				break;
-      case VICTORY::DEFEATHERO: // 02 - Defeat a specific Hero
+			case VICTORY::DEFEATHERO: // 02 - Defeat a specific Hero
 				$this->victoryCond['name'] = 'Defeat a specific Hero';
 				$this->victoryCond['coor'] = new MapCoords($winInfo1, $winInfo2);
 				break;
@@ -1134,21 +1134,21 @@ class H2MAPSCAN {
 				$artifact = ($winInfo1 == 0) ? 'Ultimate artifact' : $this->GetArtifactById($winInfo1 - 1);
 				$this->victoryInfo = 'Acquire a specific artifact: '.$artifact;
 				break;
-      case VICTORY::ALLIED: // 04 - allied win
+			case VICTORY::ALLIED: // 04 - allied win
 				for($i = 0; $i < PLAYERSNUM; $i++) {
-				  if(!array_key_exists($i, $this->players)) {
-				  	$winInfo1++;
-				    continue;
+					if(!array_key_exists($i, $this->players)) {
+						$winInfo1++;
+						continue;
 					}
-				  if($i < $winInfo1) {
-				    $this->teams[0][] = $i;
+					if($i < $winInfo1) {
+						$this->teams[0][] = $i;
 					}
 					else {
-				    $this->teams[1][] = $i;
+						$this->teams[1][] = $i;
 					}
 				}
 				$this->teamscount = 2;
-		
+
 				$this->victoryCond['name'] = 'Allied victory';
 				$this->victoryInfo = 'Allied victory: '.implode($this->teams[0], ', ').' vs '.implode($this->teams[1], ', ');
 				break;
@@ -1158,11 +1158,11 @@ class H2MAPSCAN {
 				$this->victoryCond['resource'] = $winInfo1;
 				$this->victoryInfo = 'Accumulate gold: '.$winInfo1;
 				break;
-      case VICTORY::NONE: // 0
+			case VICTORY::NONE: // 0
 			default:
-      	$this->victoryCond['name'] = 'Standard';
+				$this->victoryCond['name'] = 'Standard';
 				$this->victoryInfo = 'Defeat all players';
-				break; 
+				break;
 		}
 		if($this->victoryCond['AI_cancomplete']) {
 			$this->victoryInfo .= '<br />AI can complete condition too';
@@ -1174,11 +1174,11 @@ class H2MAPSCAN {
 
 	public function LossCondition(){
 		// 1	Special loss condition
-    $this->SetPos(0x22);
-    $this->lossCond['type'] = $this->ReadUint8();
-    $lossCond1 = $this->ReadUint16();
-    $this->SetPos(0x2e);
-    $lossCond2 = $this->ReadUint16();
+		$this->SetPos(0x22);
+		$this->lossCond['type'] = $this->ReadUint8();
+		$lossCond1 = $this->ReadUint16();
+		$this->SetPos(0x2e);
+		$lossCond2 = $this->ReadUint16();
 
 		switch($this->lossCond['type']){
 			case LOSS::TOWN: // 00 - Lose a specific town
@@ -1198,8 +1198,8 @@ class H2MAPSCAN {
 				$this->lossInfo = 'Complete before month '.$month.' and '.($lossCond1 % 28).' day';
 				break;
 			case LOSS::NONE:
-			default: 
-      	$this->lossCond['name'] = 'None';
+			default:
+				$this->lossCond['name'] = 'None';
 				$this->lossInfo = 'Loose all towns and heroes';
 				break;
 		}
@@ -1239,46 +1239,51 @@ class H2MAPSCAN {
 			case OBJECTS::OBJ_RNDARTIFACT1:
 			case OBJECTS::OBJ_RNDARTIFACT2:
 			case OBJECTS::OBJ_RNDARTIFACT3:
-			  $radius = ($cell->generalObject == OBJECTS::OBJ_RNDULTIMATEARTIFACT) ? ', radius='.(($cell->quantity1 >> 3) | ($cell->quantity2 << 5)) : '';
-      	$this->artifacts_list[] = new ListObject($this->GetObjectById($cell->generalObject), new MapCoords($x, $y), 'Map'.$radius);
-        if($this->special_access) {
-        	$this->terrain[$y][$x]->special = MAPSPECIAL::ARTIFACT;
+				$radius = ($cell->generalObject == OBJECTS::OBJ_RNDULTIMATEARTIFACT) ? ', radius='.(($cell->quantity1 >> 3) | ($cell->quantity2 << 5)) : '';
+				$this->artifacts_list[] = new ListObject($this->GetObjectById($cell->generalObject), new MapCoords($x, $y), 'Map'.$radius);
+				if($this->special_access) {
+					$this->terrain[$y][$x]->special = MAPSPECIAL::ARTIFACT;
 				}
 				break;
 
 			case OBJECTS::OBJ_ARTIFACT:
-			  $artid = ($cell->indexName1 - 1) / 2;
-			  $this->artifacts_list[] = new ListObject($this->GetArtifactById($artid), new MapCoords($x, $y), 'Map');
-        if($this->special_access) {
-        	$this->terrain[$y][$x]->special = MAPSPECIAL::ARTIFACT;
+				$artid = ($cell->indexName1 - 1) / 2;
+				$info = '';
+				if($artid == 86) { //spell scroll
+					$spellid = ($cell->quantity1 >> 3) | ($cell->quantity2 << 5);
+					$info = ', '.$this->GetSpellById($spellid + 1);
 				}
-			  break;
+				$this->artifacts_list[] = new ListObject($this->GetArtifactById($artid), new MapCoords($x, $y), 'Map'.$info);
+				if($this->special_access) {
+					$this->terrain[$y][$x]->special = MAPSPECIAL::ARTIFACT;
+				}
+				break;
 
 			case OBJECTS::OBJ_ABANDONEDMINE:
 				if($cell->indexName1 != 8) break; //8 is value for access tile, dont count others
-      	$this->mines_list[] = new Listobject($this->GetObjectById($cell->generalObject), new MapCoords($x, $y), '');
-        if($this->special_access) {
-        	$this->terrain[$y][$x]->special = MAPSPECIAL::MINE;
+				$this->mines_list[] = new Listobject($this->GetObjectById($cell->generalObject), new MapCoords($x, $y), '');
+				if($this->special_access) {
+					$this->terrain[$y][$x]->special = MAPSPECIAL::MINE;
 				}
 				break;
 
 			case OBJECTS::OBJ_MONSTER:
 				$count = ($cell->quantity1 >> 3) | ($cell->quantity2 << 5);
-      	$this->monsters_list[] = new Listobject($this->GetCreatureById($cell->indexName1 + 1), new MapCoords($x, $y), '', OWNERNONE, $count);
-        if($this->special_access) {
-        	$this->terrain[$y][$x]->special = MAPSPECIAL::MONSTER;
+				$this->monsters_list[] = new Listobject($this->GetCreatureById($cell->indexName1 + 1), new MapCoords($x, $y), '', OWNERNONE, $count);
+				if($this->special_access) {
+					$this->terrain[$y][$x]->special = MAPSPECIAL::MONSTER;
 				}
 				break;
 
-      case OBJECTS::OBJ_RNDMONSTER:
-      case OBJECTS::OBJ_RNDMONSTER1:
-      case OBJECTS::OBJ_RNDMONSTER2:
-      case OBJECTS::OBJ_RNDMONSTER3:
-      case OBJECTS::OBJ_RNDMONSTER4:
-      	$count = ($cell->quantity1 << 8) | $cell->quantity2;
-      	$this->monsters_list[] = new Listobject($this->GetObjectById($cell->generalObject), new MapCoords($x, $y), '', OWNERNONE, $count);
-        if($this->special_access) {
-        	$this->terrain[$y][$x]->special = MAPSPECIAL::MONSTER;
+			case OBJECTS::OBJ_RNDMONSTER:
+			case OBJECTS::OBJ_RNDMONSTER1:
+			case OBJECTS::OBJ_RNDMONSTER2:
+			case OBJECTS::OBJ_RNDMONSTER3:
+			case OBJECTS::OBJ_RNDMONSTER4:
+				$count = ($cell->quantity1 << 8) | $cell->quantity2;
+				$this->monsters_list[] = new Listobject($this->GetObjectById($cell->generalObject), new MapCoords($x, $y), '', OWNERNONE, $count);
+				if($this->special_access) {
+					$this->terrain[$y][$x]->special = MAPSPECIAL::MONSTER;
 				}
 				break;
 
@@ -1287,33 +1292,33 @@ class H2MAPSCAN {
 				break;
 
 			case OBJECTS::OBJ_HEROES:
-			  break;
+				break;
 
 		}
-		
+
 	}
 
 	private function ReadTerrain() {
 
-	  $this->SetPos(MP2OFFSETDATA - 2 * 4);
+		$this->SetPos(MP2OFFSETDATA - 2 * 4);
 
 		$w = $this->ReadUint32();
-	  $h = $this->ReadUint32();
+		$h = $this->ReadUint32();
 
 		// seek to ADDONS block
-    $this->SkipBytes($w * $h * SIZEOFMP2TILE);
-    
-    $numAddons = $this->ReadUint32();
+		$this->SkipBytes($w * $h * SIZEOFMP2TILE);
+
+		$numAddons = $this->ReadUint32();
 
 		$mp2addons = array();
 
-    
+
 		//reading addons can be skipped, because it's not used anywhere in this app
-    $this->SkipBytes(SIZEOFMP2ADDON * $numAddons);
+		$this->SkipBytes(SIZEOFMP2ADDON * $numAddons);
 		// read all addons
-    /*
+		/*
 		for($i = 0; $i < $numAddons; $i++) {
-    	$mp2addons[$i] = new mp2addon();
+			$mp2addons[$i] = new mp2addon();
 			$mp2addons[$i]->indexAddon = $this->ReadUint16();
 			$mp2addons[$i]->objectNameN1 = $this->ReadUint8() * 2;
 			$mp2addons[$i]->indexNameN1 = $this->ReadUint8();
@@ -1322,13 +1327,13 @@ class H2MAPSCAN {
 			$mp2addons[$i]->indexNameN2 = $this->ReadUint8();
 			$mp2addons[$i]->uniqNumberN1 = $this->ReadUint32();
 			$mp2addons[$i]->uniqNumberN2 = $this->ReadUint32();
-    }
+		}
 		*/
 
 		$addons_endpos = $this->GetPos();
-    
-    $this->SetPos(MP2OFFSETDATA);
-	
+
+		$this->SetPos(MP2OFFSETDATA);
+
 		$tileindex = 0;
 		for($y = 0; $y < $this->map_size; $y++) {
 			for($x = 0; $x < $this->map_size; $x++) {
@@ -1336,7 +1341,7 @@ class H2MAPSCAN {
 
 				//we can skip some properties, since this app does not use them
 				$cell->surface = $this->ReadUint16();
-        //$this->SkipBytes(18); //skipp all but surface
+				//$this->SkipBytes(18); //skipp all but surface
 
 				$this->SkipBytes(1);
 				//$cell->objectName1 = $this->ReadUint8();
@@ -1356,7 +1361,7 @@ class H2MAPSCAN {
 				//$cell->indexAddon = $this->ReadUint16();
 				//$cell->uniqNumber1 = $this->ReadUint32();
 				//$cell->uniqNumber2 = $this->ReadUint32();
-				
+
 				//set access based on OBJ vs OBJN (non passable) prefix. It's not 100% accurate, but it's pretty close
 				$cell->access = in_array($cell->generalObject, $this->CS->ObjectsNonPassable) ? 1 : 0;
 				$cell->owner = OWNERNONE;
@@ -1369,7 +1374,7 @@ class H2MAPSCAN {
 					$this->objects_unique[$cell->generalObject] = array('name' => $this->GetObjectById($cell->generalObject), 'count' => 0);
 				}
 				$this->objects_unique[$cell->generalObject]['count']++;
-				
+
 				//tileindex of objects with more properties for later reading
 				switch($cell->generalObject) {
 					case OBJECTS::OBJ_RNDTOWN:
@@ -1385,7 +1390,7 @@ class H2MAPSCAN {
 						break;
 					default: break;
 				}
-				
+
 				//no need to read addons info, this app does not use them
 				// load all addon for current tils
 				/*$
@@ -1399,17 +1404,17 @@ class H2MAPSCAN {
 					$indexAddBlock = $mp2addons[$indexAddBlock]->indexAddon;
 				}
 				*/
-				
+
 				$this->ProcessObject($cell, $x, $y);
-				
+
 				$tileindex++;
 			}
 		}
 
-    $this->SetPos($addons_endpos);
+		$this->SetPos($addons_endpos);
 	}
 
-	
+
 	public function BuildMap() {
 
 		$this->mapimage = sanity_string($this->mapfilename).'.png';
@@ -1420,15 +1425,15 @@ class H2MAPSCAN {
 			$imgmap = imagecreate($this::IMGSIZE, $this::IMGSIZE); //resized to constant size for all map sizes
 			/* From web
 				First byte - surface codes: (RGB colors on the map)
-				ID	 Terrain         
-				00 - Water           
-				01 - Grass           
-				02 - Snow            
-				03 - Swamp           
-				04 - Lava            
-        05 - Desert          
-        06 - Dirt            
-        07 - wasteland       
+				ID   Terrain
+				00 - Water
+				01 - Grass
+				02 - Snow
+				03 - Swamp
+				04 - Lava
+				05 - Desert
+				06 - Dirt
+				07 - wasteland
 				08 - Beach
 				*/
 			$this->imgcolors['dirt']          = imagecolorallocate($this->img, 0x68, 0x34, 0x10); //#68 34 10
@@ -1461,12 +1466,12 @@ class H2MAPSCAN {
 
 			$this->imgcolors['none']          = imagecolorallocate($this->img, 0xff, 0xff, 0xff);
 			$this->imgcolors['mine']          = imagecolorallocate($this->img, 0xff, 0x00, 0xcc);
-      $this->imgcolors['artifact']      = imagecolorallocate($this->img, 0x33, 0xff, 0xff);
-      $this->imgcolors['monster']       = imagecolorallocate($this->img, 0x33, 0xff, 0x00);
+			$this->imgcolors['artifact']      = imagecolorallocate($this->img, 0x33, 0xff, 0xff);
+			$this->imgcolors['monster']       = imagecolorallocate($this->img, 0x33, 0xff, 0x00);
 
 			// Map
 			$x = $y = 0;
-			
+
 			foreach($this->terrain as $y => $col) {
 				foreach($col as $x => $cell) {
 					$color = $this->GetCellSurface($cell);
@@ -1483,7 +1488,7 @@ class H2MAPSCAN {
 	}
 
 	public function DisplayMap() {
-  	$imgmapname = MAPDIRIMG.$this->mapimage;
+		$imgmapname = MAPDIRIMG.$this->mapimage;
 
 		$mapsizepow = $this->map_size * $this->map_size;
 		$output = '<br />Map : size='.$this->map_size.', cells='.$mapsizepow.', bytes='.($mapsizepow * 20).'<br />';
@@ -1495,17 +1500,17 @@ class H2MAPSCAN {
 	private function ReadTroops() {
 		// set monster id
 		$troops = array();
-	  for($i = 0; $i < 5; $i++) {
+		for($i = 0; $i < 5; $i++) {
 			$monid = $this->ReadUint8();
 			if($monid == HNONE) {
 				continue;
 			}
-	    $troops[$i]['Unit'] = $this->GetCreatureById($monid + 1);
+			$troops[$i]['Unit'] = $this->GetCreatureById($monid + 1);
 		}
-	  // set count
-	  for($i = 0; $i < 5; $i++) {
-	    $count = $this->ReadUint16();
-	    if(array_key_exists($i, $troops)) {
+		// set count
+		for($i = 0; $i < 5; $i++) {
+			$count = $this->ReadUint16();
+			if(array_key_exists($i, $troops)) {
 				$troops[$i]['Count'] = $count;
 			}
 		}
@@ -1521,14 +1526,14 @@ class H2MAPSCAN {
 	}
 
 	private function PrintResources($res) {
-  	$eres = array();
+		$eres = array();
 		foreach($res as $r => $amount) {
 			if($amount == 0) continue;
 			$eres[] = $amount.' '.$this->GetResource($r);
 		}
 		return implode($eres, '<br />');
 	}
-	
+
 	private function ReadResourses() {
 		$resources = array();
 		for($i = 0; $i < 7; $i++) {
@@ -1538,7 +1543,7 @@ class H2MAPSCAN {
 	}
 
 	private function GetCellSurface($cell){
-    
+
 		if($cell->owner != OWNERNONE) {
 			switch($cell->owner){
 				case COLORS::BLUE:   return $this->imgcolors['blue'];
@@ -1552,9 +1557,9 @@ class H2MAPSCAN {
 		}
 		elseif($this->special_access && $cell->special != MAPSPECIAL::NONE) {
 			switch($cell->special) {
-      	case MAPSPECIAL::MINE:     return $this->imgcolors['mine'];
-        case MAPSPECIAL::ARTIFACT: return $this->imgcolors['artifact'];
-        case MAPSPECIAL::MONSTER:  return $this->imgcolors['monster'];
+				case MAPSPECIAL::MINE:     return $this->imgcolors['mine'];
+				case MAPSPECIAL::ARTIFACT: return $this->imgcolors['artifact'];
+				case MAPSPECIAL::MONSTER:  return $this->imgcolors['monster'];
 			}
 		}
 		elseif($cell->access == 0){
@@ -1582,7 +1587,7 @@ class H2MAPSCAN {
 			else          return $this->imgcolors['bsand']; //432
 		}
 	}
-	
+
 	private function GetVersionName() {
 		switch($this->version) {
 			case $this::H2O: $this->versionname = 'SW'; break;
@@ -1600,7 +1605,7 @@ class H2MAPSCAN {
 			default:  $this->map_sizename = '?'; break;
 		}
 	}
-	
+
 	private function GetDifficulty() {
 		switch($this->map_diff) {
 			case 0: $this->map_diffname = 'Easy'; break;
@@ -1610,7 +1615,7 @@ class H2MAPSCAN {
 			default: $this->map_diffname = '?'; break;
 		}
 	}
-	
+
 	private function GetResource($resourceid) {
 		switch($resourceid) {
 			case 0: return 'Wood';
@@ -1627,23 +1632,27 @@ class H2MAPSCAN {
 	private function GetArtifactById($artid) {
 		return FromArray($artid, $this->CS->Artifacts);
 	}
-	
+
+	private function GetSpellById($spellid) {
+		return FromArray($spellid, $this->CS->Spells);
+	}
+
 	private function GetCreatureById($monid) {
 		return FromArray($monid, $this->CS->Monster);
 	}
-	
+
 	private function GetResourceById($id) {
 		return $this->GetResource($id);
 	}
-	
+
 	private function GetMineById($id) {
 		return FromArray($id, $this->CS->Mines);
 	}
-	
+
 	private function GetHeroById($id) {
 		return FromArray($id, $this->CS->Heroes);
 	}
-	
+
 	private function GetTownById($id) {
 		return FromArray($id, $this->CS->TownType);
 	}
@@ -1651,11 +1660,11 @@ class H2MAPSCAN {
 	private function GetObjectById($id) {
 		return FromArray($id, $this->CS->Objects);
 	}
-	
+
 	private function GetSecskillById($id) {
 		return FromArray($id, $this->CS->SecondarySkill);
 	}
-	
+
 	private function GetSecskillLevelById($id) {
 		return FromArray($id, $this->CS->SecSkillLevel);
 	}
@@ -1668,8 +1677,8 @@ class H2MAPSCAN {
 				}
 			}
 		}
-    elseif($objid == MAPOBJECTS::HERO) {
-    	foreach($this->heroes_list as $hero) {
+		elseif($objid == MAPOBJECTS::HERO) {
+			foreach($this->heroes_list as $hero) {
 				if($coords->x == $hero['coor']->x && $coords->y == $hero['coor']->y) {
 					return $hero['data']['name'];
 				}
@@ -1714,12 +1723,12 @@ class H2MAPSCAN {
 		}
 		return $res;
 	}
-	
+
 	//unused, no 64 bit in map format
 	/*private function ReadUint64(){
 		return $this->fix64($this->ReadUint32(), $this->ReadUint32());
 	}
-	
+
 	private function fix64($numL, $numH){
 		if($numH < 0) {
 			$numH += MININT32;
@@ -1736,7 +1745,7 @@ class H2MAPSCAN {
 	*/
 
 	private function ReadString($length = 0){
-	  $res = '';
+		$res = '';
 		if($this->pos >= $this->length || $this->pos < 0){
 			dbglog();
 			$this->mapdata = null;
@@ -1750,20 +1759,20 @@ class H2MAPSCAN {
 		$bytesread = 0;
 		while(true) {
 			if($length > 0 && $bytesread >= $length) {
-			  break;
+				break;
 			}
 			$byte = $this->mapdata[$this->pos++];
 			$bytesread++;
-		  if(ord($byte) == 0) {
-		    break;
+			if(ord($byte) == 0) {
+				break;
 			}
-		  $res .= $byte;
+			$res .= $byte;
 		}
 		//if given length, skip by unread bytes
 		if($length > 0){
 			$this->pos += ($length - $bytesread);
 		}
-    return $this->SC->Convert($res);
+		return $this->SC->Convert($res);
 	}
 
 	private function SkipBytes($bytes = 31){
@@ -1772,15 +1781,15 @@ class H2MAPSCAN {
 
 	//read byte from position relative to current position and get back to same position
 	private function ReadByteRelPos($num) {
-	  if($this->pos + $num + 1 > $this->length) {
+		if($this->pos + $num + 1 > $this->length) {
 			return; //overread
 		}
-	  $this->pos += $num;
-	  $res = $this->ReadUint8();
-	  $this->pos -= ($num + 1);
-	  return $res;
+		$this->pos += $num;
+		$res = $this->ReadUint8();
+		$this->pos -= ($num + 1);
+		return $res;
 	}
-	
+
 	private function SetPos($pos){
 		$this->pos = $pos;
 	}
@@ -1788,7 +1797,7 @@ class H2MAPSCAN {
 	private function GetPos(){
 		return $this->pos;
 	}
-	
+
 	//print current position
 	private function ppos(){
 		vd(dechex($this->pos). ' '.$this->pos);
@@ -1801,11 +1810,11 @@ class H2MAPSCAN {
 	private function bvar($var){
 		$bprint = sprintf('%08b', $var & 0xff);
 		if($var > 0xff) {
-    	$bprint = sprintf('%08b', ($var >> 8) & 0xff).' '.$bprint;
+			$bprint = sprintf('%08b', ($var >> 8) & 0xff).' '.$bprint;
 		}
 		return $bprint;
 	}
-	
+
 }
 
 
@@ -1824,7 +1833,7 @@ class MapCell {
 	//public $indexAddon;	// zero or index addons_t
 	//public $uniqNumber1;	// level 1.0
 	//public $uniqNumber2;	// level 2.0
-	
+
 	public $access;       //accessibility
 	public $owner;        //is object on tile owned -> owner id
 	public $special;      //display some object on map with special colour
@@ -1849,12 +1858,12 @@ class mp2addon {
 class MapCoords {
 	public $x;
 	public $y;
-	
+
 	public function __construct($x = COOR_INVALID, $y = COOR_INVALID) {
 		$this->x = $x;
 		$this->y = $y;
 	}
-	
+
 	public function GetCoords(){
 		if($this->x == COOR_INVALID) {
 			return '?';
